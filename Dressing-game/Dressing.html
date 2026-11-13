@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>옷 입히기 게임</title>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+  <style>
+      :root{--bg:#ece7f7;--panel:#fff;--ink:#2b2540;--mute:#7a7396;--line:#d9d2ee;--acc:#3dbe9b;--accink:#06382c;--pop:#ff7a7a;
+          box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+      @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1e1a30;--panel:#2a2542;--ink:#f1edff;--mute:#a49dc4;--line:#433c66;--accink:#06382c;color-scheme:dark}}
+      :root[data-theme="dark"]{--bg:#1e1a30;--panel:#2a2542;--ink:#f1edff;--mute:#a49dc4;--line:#433c66;--accink:#06382c;color-scheme:dark}
+      html{scroll-padding-top:env(safe-area-inset-top,0px)}
+      *{box-sizing:border-box}
+      body{margin:0;background:var(--bg);color:var(--ink);font-family:'Jua','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:17px}
+      main{max-width:860px;margin:0 auto;padding:20px 16px 32px}
+      h1{font-size:28px;margin:0 0 4px;font-weight:400}
+      .sub{margin:0 0 18px;color:var(--mute)}
+      .game{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start}
+      .stage{flex:0 1 300px;margin:0 auto;width:100%;max-width:320px}
+      #doll{width:100%;display:block;border-radius:28px;border:3px solid var(--ink);background:var(--panel)}
+      .row{display:flex;gap:10px;margin-top:12px}
+      .row button{flex:1}
+      .panel{flex:1 1 300px;background:var(--panel);border:2px solid var(--line);border-radius:20px;padding:14px}
+      .gender{display:flex;gap:8px;margin-bottom:12px}
+      .pick{display:flex;align-items:center;gap:10px;margin-top:14px;color:var(--mute)}
+      .pick input{width:46px;height:36px;border:2px solid var(--line);border-radius:10px;padding:0;background:none;cursor:pointer}
+      .sign{background:repeating-linear-gradient(90deg,var(--pop) 0 22px,#fff 22px 44px);border-radius:12px 12px 4px 4px;padding:10px 14px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;font-size:20px;box-shadow:0 6px 0 -2px rgba(0,0,0,.14)}
+      .sign b{background:var(--panel);color:var(--ink);padding:2px 14px;border-radius:999px;font-weight:400}
+      .sign small{background:var(--acc);color:var(--accink);padding:2px 10px;border-radius:999px;font-size:14px}
+      .tag{border-style:dashed;text-align:left}
+      .tag small{display:block;color:var(--mute);font-size:14px}
+      .rcpt{font-family:'Courier New',monospace;font-size:14px;background:#fffdf5;color:#2b2540;border:1px solid #d9d2ee;padding:8px 12px;margin:8px 0;border-radius:4px}
+      .rcpt div{display:flex;justify-content:space-between}
+      .rcpt .sum{border-top:1px dashed #2b2540;margin-top:4px;padding-top:4px}
+      .modes{display:flex;gap:8px;margin-bottom:16px}
+      .stats{display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:space-between;color:var(--mute);margin-bottom:8px}
+      .vip{background:#e8b04a;color:#3a2a00;border-radius:6px;padding:0 6px;font-size:14px;margin-right:6px}
+      .bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden;margin-bottom:12px}
+      .bar i{display:block;height:100%;background:var(--acc)}
+      .act small{color:var(--mute);font-size:14px}
+      .bubble{background:var(--bg);border:2px solid var(--ink);border-radius:16px 16px 16px 4px;padding:10px 14px;margin-bottom:12px}
+      .bubble p{margin:6px 0 0}
+      .res{border:2px dashed var(--line);border-radius:14px;padding:10px 14px;margin-bottom:12px}
+      .res ul{margin:6px 0;padding:0;list-style:none}
+      .stars{font-size:24px;color:#e8b04a}
+      #shop .act{width:100%;margin-bottom:12px}
+      .tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+      button{font:inherit;color:var(--ink);cursor:pointer}
+      .tab{border:2px solid var(--line);background:transparent;border-radius:999px;padding:6px 14px}
+      .tab[aria-selected="true"]{background:var(--acc);border-color:var(--acc);color:var(--accink)}
+      h2{font-size:16px;font-weight:400;color:var(--mute);margin:12px 0 8px}
+      .chips,.sw{display:flex;flex-wrap:wrap;gap:8px}
+      .chip{border:2px solid var(--line);background:transparent;border-radius:12px;padding:8px 14px}
+      .chip[aria-pressed="true"]{border-color:var(--ink);box-shadow:3px 3px 0 var(--ink)}
+      .dot{width:38px;height:38px;border-radius:50%;border:3px solid var(--panel);box-shadow:0 0 0 2px var(--line);padding:0}
+      .dot[aria-pressed="true"]{box-shadow:0 0 0 3px var(--ink)}
+      .act{border:2px solid var(--ink);background:var(--panel);border-radius:14px;padding:10px}
+      .act.pop{background:var(--pop);color:#3a0d0d}
+      button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+      @media (prefers-reduced-motion:no-preference){.bounce{animation:b .35s}@keyframes b{50%{transform:scale(1.02) rotate(-.6deg)}}}
+  </style>
+</head>
+<body>
+<main>
+  <h1>옷 입히기 게임</h1>
+  <p class="sub">머리부터 신발까지 골라서 꾸미거나, 가게에서 손님에게 옷을 추천해 보세요.</p>
+  <div class="modes" id="modes"></div>
+  <div class="game">
+    <div class="stage">
+      <svg id="doll" viewBox="0 0 240 400" role="img" aria-label="꾸미는 중인 캐릭터"></svg>
+      <div class="row" id="acts">
+        <button class="act pop" id="rnd">랜덤으로 입히기</button>
+        <button class="act" id="rst">처음으로</button>
+      </div>
+    </div>
+    <section class="panel">
+      <div id="shop" hidden></div>
+      <div class="gender" id="gender" role="group" aria-label="성별"></div>
+      <div class="tabs" role="tablist" id="tabs"></div>
+      <div id="opts"></div>
+    </section>
+  </div>
+</main>
+<script>
+  var CATS=[
+    {id:'hair',label:'머리',styles:['짧은 머리','긴 머리','똥머리','양갈래','단발머리','포니테일'],m:['짧은 머리','스포츠머리','올백','덥수룩','투블럭','곱슬머리'],colors:['#2b2540','#6b4226','#e8b04a','#d94f6b','#5b7cf0','#eeeeee']},
+    {id:'top',label:'상의',styles:['티셔츠','후드티','원피스','민소매','스웨터'],m:['티셔츠','후드티','셔츠','민소매','스웨터'],colors:['#ff7a7a','#ffd24a','#3dbe9b','#5b7cf0','#b57bee','#ffffff','#2b2540']},
+    {id:'bottom',label:'하의',styles:['바지','치마','반바지','롱스커트','레깅스'],m:['바지','반바지','7부 바지','넓은 바지','슬림 바지'],colors:['#4a63c9','#2b2540','#ff9ec4','#8fd3a8','#e8d9a8','#c9c9d6']},
+    {id:'shoes',label:'신발',styles:['운동화','부츠','샌들','하이탑','로퍼'],colors:['#ffffff','#2b2540','#d94f6b','#8a5a36','#ffd24a','#5b7cf0']},
+    {id:'outer',label:'외투',styles:['없음','가디건','재킷','패딩','조끼','코트'],colors:['#e8d9a8','#2b2540','#d94f6b','#5b7cf0','#3dbe9b','#ffffff']},
+    {id:'socks',label:'양말',styles:['없음','짧은 양말','긴 양말','줄무늬 양말','무릎 위 양말','물방울 양말'],colors:['#ffffff','#2b2540','#ff7a7a','#ffd24a','#5b7cf0','#3dbe9b']},
+    {id:'bag',label:'가방',styles:['없음','백팩','크로스백','토트백','숄더백','힙색'],colors:['#8a5a36','#2b2540','#ff7a7a','#ffd24a','#3dbe9b','#5b7cf0']},
+    {id:'acc',label:'소품',styles:['없음','안경','선글라스','모자','리본','왕관','비니','머리띠'],colors:['#2b2540','#ff7a7a','#ffd24a','#3dbe9b','#5b7cf0','#ffffff']},
+    {id:'face',label:'표정',styles:['미소','활짝 웃음','윙크','놀람','시무룩'],colors:[]},
+    {id:'pose',label:'포즈',styles:['차렷','손 흔들기','만세','팔 벌리기'],colors:[]},
+    {id:'skin',label:'피부',styles:null,colors:['#ffe0c7','#f7c9a3','#e0a678','#b97b50','#8a5a38']},
+    {id:'bg',label:'배경',styles:null,colors:['#fff1c9','#cfeee3','#d5e1ff','#ffd9e4','#e6dcff','#2f2a4a']}
+  ];
+  (function(){
+    var MORE=['#ff9ec4','#ff9f40','#a3e635','#38bdf8','#1e3a8a','#7c3aed','#be123c','#6b7280','#92400e','#fde68a','#0f766e','#f472b6'];
+    var SKIN=['#fff0e0','#fbe5d6','#e9b98f','#c68a5e','#6f4426','#4a2c17'];
+    CATS.forEach(function(c){
+      var extra=c.id==='skin'?SKIN:(c.colors.length?MORE:[]);
+      extra.forEach(function(k){if(c.colors.indexOf(k)<0)c.colors.push(k)});
+    });
+  })();
+  var DEF={hair:[0,0],top:[0,0],bottom:[0,0],shoes:[0,0],outer:[0,0],socks:[0,0],bag:[0,0],acc:[0,0],face:[0,0],pose:[0,0],skin:[0,0],bg:[0,0]};
+  var sel,tab='hair',g='f',mode='play';
+  function reset(){sel=JSON.parse(JSON.stringify(DEF))}
+  reset();
+  function col(id){var c=CATS.filter(function(x){return x.id===id})[0];return sel[id][2]||c.colors[sel[id][1]]}
+  function shade(h,a){var n=parseInt(h.slice(1),16),r=n>>16,g=n>>8&255,b=n&255;
+    function f(v){return Math.max(0,Math.min(255,Math.round(v+a)))}
+    return 'rgb('+f(r)+','+f(g)+','+f(b)+')'}
+
+  function eyes(e){
+    var d='#2b2540',dot=function(x,r){return '<circle cx="'+x+'" cy="96" r="'+r+'" fill="'+d+'"/><circle cx="'+(x-1.5)+'" cy="94.5" r="1.4" fill="#fff"/>'},
+      arc=function(x){return '<path d="M'+(x-7)+' 98 Q'+x+' 88 '+(x+7)+' 98" fill="none" stroke="'+d+'" stroke-width="3.5" stroke-linecap="round"/>'};
+    if(e===1)return arc(104)+arc(136);
+    if(e===2)return dot(104,4.5)+arc(136);
+    if(e===3)return dot(104,6.5)+dot(136,6.5);
+    if(e===4)return dot(104,4.5)+dot(136,4.5)+'<path d="M96 86 L112 90 M144 86 L128 90" stroke="'+d+'" stroke-width="3" stroke-linecap="round"/>';
+    return dot(104,4.5)+dot(136,4.5);
+  }
+  function mouth(e){
+    var d='#2b2540';
+    if(e===1)return '<path d="M108 107 Q120 128 132 107Z" fill="#7a2d3a" stroke="'+d+'" stroke-width="2.5" stroke-linejoin="round"/>';
+    if(e===3)return '<ellipse cx="120" cy="115" rx="5" ry="7" fill="#7a2d3a" stroke="'+d+'" stroke-width="2.5"/>';
+    if(e===4)return '<path d="M110 117 Q120 108 130 117" fill="none" stroke="'+d+'" stroke-width="3" stroke-linecap="round"/>';
+    return '<path d="M110 110 Q120 119 130 110" fill="none" stroke="'+d+'" stroke-width="3" stroke-linecap="round"/>';
+  }
+  function poseUp(u){
+    var A=[[0,0],[0,-150],[150,-150],[35,-35]][sel.pose[0]];
+    if(!A[0]&&!A[1])return u;
+    var L='',R='';
+    u=u.replace(/<rect x="(\d+)"[^>]*\/>/g,function(m,x){x=+x;if(x<=60){L+=m;return ''}if(x>=156){R+=m;return ''}return m});
+    return u+'<g transform="rotate('+A[0]+' 70 146)">'+L+'</g><g transform="rotate('+A[1]+' 170 146)">'+R+'</g>';
+  }
+  function draw(){
+    var skin=col('skin'),hc=col('hair'),tc=col('top'),bc=col('bottom'),sc=col('shoes'),ac=col('acc'),bg=col('bg');
+    var M=g==='m',sk=sel.socks[0],ph=sk?100:112,OU=sel.outer[0],BG=sel.bag[0],oc=col('outer'),gc=col('bag'),kc=col('socks'),hs=sel.hair[0],ts=sel.top[0],bs=sel.bottom[0],ss=sel.shoes[0],as=sel.acc[0];
+    var o='<rect width="240" height="400" fill="'+bg+'"/><ellipse cx="120" cy="372" rx="70" ry="9" fill="rgba(0,0,0,.15)"/>';
+    if(mode==='shop'){o+='<rect x="0" y="356" width="240" height="44" fill="rgba(0,0,0,.08)"/><rect x="8" y="18" width="224" height="5" rx="2" fill="#8a5a36"/>';[[16,'#ff7a7a'],[42,'#5b7cf0'],[172,'#ffd24a'],[198,'#3dbe9b']].forEach(function(p){o+='<path d="M'+(p[0]+11)+' 23 v6" stroke="#8a5a36" stroke-width="2"/><rect x="'+p[0]+'" y="29" width="22" height="26" rx="4" fill="'+p[1]+'"/>'})}
+    // back hair
+    if(hs===1&&!M)o+='<rect x="76" y="70" width="88" height="130" rx="30" fill="'+hc+'"/>';
+    if(hs===3&&!M)o+='<circle cx="72" cy="112" r="20" fill="'+hc+'"/><circle cx="168" cy="112" r="20" fill="'+hc+'"/>';
+    if(hs===2&&!M)o+='<circle cx="120" cy="40" r="20" fill="'+hc+'"/>';
+    if(hs===4&&!M)o+='<rect x="76" y="70" width="88" height="72" rx="26" fill="'+hc+'"/>';
+    if(hs===5&&!M)o+='<rect x="158" y="82" width="18" height="78" rx="9" fill="'+hc+'"/><circle cx="162" cy="84" r="12" fill="'+hc+'"/>';
+    // legs
+    o+='<rect x="95" y="240" width="22" height="115" rx="8" fill="'+skin+'"/><rect x="123" y="240" width="22" height="115" rx="8" fill="'+skin+'"/>';
+    if(sk){var sy=sk===1?332:(sk===4?262:286);[95,123].forEach(function(x){o+='<rect x="'+x+'" y="'+sy+'" width="22" height="'+(352-sy)+'" rx="7" fill="'+kc+'"/>';if(sk===5){for(var y=sy+10;y<346;y+=16)o+='<circle cx="'+(x+11)+'" cy="'+y+'" r="3" fill="'+shade(kc,-110)+'"/>'}if(sk===3){for(var y=sy+6;y<346;y+=14)o+='<rect x="'+x+'" y="'+y+'" width="22" height="6" fill="'+shade(kc,-110)+'"/>'}})}
+    // bottom
+    if(ts!==2||M){
+      if(bs===0)o+='<rect x="92" y="236" width="27" height="'+ph+'" rx="6" fill="'+bc+'"/><rect x="121" y="236" width="27" height="'+ph+'" rx="6" fill="'+bc+'"/>';
+      if(bs===1&&!M)o+='<path d="M86 236 H154 L168 310 H72Z" fill="'+bc+'"/><path d="M86 236 H154" stroke="'+shade(bc,-40)+'" stroke-width="4"/>';
+      if(bs===2&&M)o+='<rect x="92" y="236" width="27" height="86" rx="6" fill="'+bc+'"/><rect x="121" y="236" width="27" height="86" rx="6" fill="'+bc+'"/>';
+      if((bs===2&&!M)||(bs===1&&M))o+='<rect x="90" y="236" width="29" height="58" rx="6" fill="'+bc+'"/><rect x="121" y="236" width="29" height="58" rx="6" fill="'+bc+'"/>';
+    }
+    if((ts!==2||M)&&bs===3){if(M)o+='<rect x="88" y="236" width="31" height="'+ph+'" rx="6" fill="'+bc+'"/><rect x="121" y="236" width="31" height="'+ph+'" rx="6" fill="'+bc+'"/>';else o+='<path d="M86 236 H154 L172 340 H68Z" fill="'+bc+'"/><path d="M86 236 H154" stroke="'+shade(bc,-40)+'" stroke-width="4"/>'}
+    if((ts!==2||M)&&bs===4)o+='<rect x="96" y="236" width="21" height="'+ph+'" rx="8" fill="'+bc+'"/><rect x="123" y="236" width="21" height="'+ph+'" rx="8" fill="'+bc+'"/>';
+    // shoes
+    [[89,0],[123,1]].forEach(function(p){var x=p[0];
+      if(ss===0)o+='<rect x="'+x+'" y="344" width="30" height="16" rx="8" fill="'+sc+'"/><rect x="'+x+'" y="355" width="30" height="6" rx="3" fill="'+shade('#808080',90)+'" stroke="#2b2540" stroke-width="1"/>';
+      if(ss===1)o+='<rect x="'+(x+2)+'" y="318" width="26" height="40" rx="7" fill="'+sc+'"/><rect x="'+x+'" y="348" width="32" height="13" rx="6" fill="'+shade(sc,-35)+'"/>';
+      if(ss===3)o+='<rect x="'+(x+2)+'" y="330" width="26" height="28" rx="7" fill="'+sc+'"/><rect x="'+x+'" y="352" width="32" height="9" rx="4" fill="#fff" stroke="#2b2540" stroke-width="1"/>';
+      if(ss===4)o+='<rect x="'+x+'" y="348" width="30" height="13" rx="6" fill="'+sc+'"/><rect x="'+x+'" y="358" width="30" height="3" fill="'+shade(sc,-60)+'"/>';
+      if(ss===2)o+='<rect x="'+x+'" y="354" width="30" height="7" rx="3" fill="'+sc+'"/><rect x="'+(x+12)+'" y="346" width="6" height="10" fill="'+sc+'"/>';
+    });
+    var base=o;o='';
+    // arms
+    var longSleeve=ts===1;
+    o+='<rect x="60" y="146" width="20" height="100" rx="10" fill="'+skin+'"/><rect x="160" y="146" width="20" height="100" rx="10" fill="'+skin+'"/>';
+    // top
+    if(ts===0)o+='<rect x="80" y="140" width="80" height="102" rx="14" fill="'+tc+'"/><rect x="58" y="142" width="24" height="42" rx="10" fill="'+tc+'"/><rect x="158" y="142" width="24" height="42" rx="10" fill="'+tc+'"/>';
+    if(ts===1)o+='<rect x="80" y="140" width="80" height="106" rx="14" fill="'+tc+'"/><rect x="58" y="142" width="24" height="98" rx="11" fill="'+tc+'"/><rect x="158" y="142" width="24" height="98" rx="11" fill="'+tc+'"/><rect x="100" y="205" width="40" height="26" rx="8" fill="'+shade(tc,-30)+'"/><path d="M104 140 Q120 170 136 140" fill="none" stroke="'+shade(tc,-45)+'" stroke-width="6" stroke-linecap="round"/>';
+    if(ts===2&&M)o+='<rect x="80" y="140" width="80" height="104" rx="12" fill="'+tc+'"/><rect x="58" y="142" width="24" height="96" rx="11" fill="'+tc+'"/><rect x="158" y="142" width="24" height="96" rx="11" fill="'+tc+'"/><path d="M104 140 L120 164 L136 140Z" fill="#fff"/><path d="M120 164 V244" stroke="'+shade(tc,-45)+'" stroke-width="3"/>';
+    if(ts===2&&!M)o+='<path d="M84 140 H156 L166 130 V150 L176 312 H64 L74 150 V130Z" fill="'+tc+'" opacity="0"/><path d="M82 140 H158 L176 312 H64Z" fill="'+tc+'"/><rect x="58" y="142" width="24" height="34" rx="10" fill="'+tc+'"/><rect x="158" y="142" width="24" height="34" rx="10" fill="'+tc+'"/><rect x="82" y="196" width="76" height="8" fill="'+shade(tc,-45)+'"/>';
+    if(ts===3)o+='<rect x="84" y="140" width="72" height="102" rx="14" fill="'+tc+'"/><path d="M100 140 Q120 164 140 140Z" fill="'+skin+'"/>';
+    if(ts===4)o+='<rect x="80" y="140" width="80" height="106" rx="14" fill="'+tc+'"/><rect x="58" y="142" width="24" height="98" rx="11" fill="'+tc+'"/><rect x="158" y="142" width="24" height="98" rx="11" fill="'+tc+'"/><rect x="80" y="232" width="80" height="14" rx="6" fill="'+shade(tc,-30)+'"/><path d="M96 140 Q120 156 144 140" fill="none" stroke="'+shade(tc,-40)+'" stroke-width="7" stroke-linecap="round"/>';
+    if(OU===1)o+='<rect x="76" y="140" width="38" height="112" rx="10" fill="'+oc+'"/><rect x="126" y="140" width="38" height="112" rx="10" fill="'+oc+'"/><rect x="56" y="142" width="26" height="98" rx="12" fill="'+oc+'"/><rect x="158" y="142" width="26" height="98" rx="12" fill="'+oc+'"/><g fill="'+shade(oc,-50)+'"><circle cx="106" cy="176" r="3"/><circle cx="106" cy="200" r="3"/><circle cx="106" cy="224" r="3"/></g>';
+    if(OU===2)o+='<rect x="76" y="140" width="38" height="96" rx="8" fill="'+oc+'"/><rect x="126" y="140" width="38" height="96" rx="8" fill="'+oc+'"/><rect x="56" y="142" width="26" height="98" rx="12" fill="'+oc+'"/><rect x="158" y="142" width="26" height="98" rx="12" fill="'+oc+'"/><path d="M96 140 L112 176 L104 140Z M144 140 L128 176 L136 140Z" fill="'+shade(oc,-50)+'"/>';
+    if(OU===3)o+='<rect x="74" y="138" width="92" height="112" rx="24" fill="'+oc+'"/><rect x="52" y="140" width="32" height="100" rx="16" fill="'+oc+'"/><rect x="156" y="140" width="32" height="100" rx="16" fill="'+oc+'"/><path d="M76 176 H164 M76 206 H164 M76 236 H164" stroke="'+shade(oc,-45)+'" stroke-width="3"/><path d="M120 140 V250" stroke="'+shade(oc,-70)+'" stroke-width="3"/>';
+    if(OU===4)o+='<rect x="78" y="140" width="38" height="96" rx="8" fill="'+oc+'"/><rect x="124" y="140" width="38" height="96" rx="8" fill="'+oc+'"/>';
+    if(OU===5)o+='<rect x="74" y="140" width="40" height="160" rx="10" fill="'+oc+'"/><rect x="126" y="140" width="40" height="160" rx="10" fill="'+oc+'"/><rect x="56" y="142" width="26" height="98" rx="12" fill="'+oc+'"/><rect x="158" y="142" width="26" height="98" rx="12" fill="'+oc+'"/><g fill="'+shade(oc,-50)+'"><circle cx="106" cy="176" r="3"/><circle cx="106" cy="206" r="3"/><circle cx="106" cy="236" r="3"/></g>';
+    if(BG===4)o+='<rect x="86" y="142" width="6" height="84" rx="3" fill="'+shade(gc,-40)+'"/><rect x="76" y="222" width="40" height="30" rx="8" fill="'+gc+'"/><rect x="76" y="222" width="40" height="10" rx="5" fill="'+shade(gc,-40)+'"/>';
+    if(BG===5)o+='<rect x="80" y="232" width="80" height="8" rx="4" fill="'+shade(gc,-40)+'"/><rect x="104" y="228" width="32" height="20" rx="8" fill="'+gc+'"/>';
+    if(BG===1)o+='<rect x="48" y="158" width="18" height="62" rx="9" fill="'+gc+'"/><rect x="174" y="158" width="18" height="62" rx="9" fill="'+gc+'"/><rect x="90" y="142" width="7" height="86" rx="3" fill="'+shade(gc,-40)+'"/><rect x="143" y="142" width="7" height="86" rx="3" fill="'+shade(gc,-40)+'"/>';
+    if(BG===2)o+='<path d="M92 142 L152 240" stroke="'+shade(gc,-40)+'" stroke-width="6"/><rect x="124" y="226" width="34" height="26" rx="6" fill="'+gc+'"/><rect x="124" y="226" width="34" height="9" rx="4" fill="'+shade(gc,-40)+'"/>';
+    if(BG===3)o+='<rect x="34" y="236" width="30" height="24" rx="14" fill="none" stroke="'+shade(gc,-40)+'" stroke-width="4"/><rect x="28" y="252" width="42" height="46" rx="8" fill="'+gc+'"/>';
+    o=base+poseUp(o);
+    // neck + head
+    o+='<rect x="108" y="122" width="24" height="24" fill="'+shade(skin,-18)+'"/>';
+    o+='<circle cx="120" cy="92" r="40" fill="'+skin+'"/>';
+    o+=eyes(sel.face[0]);
+    if(!M)o+='<ellipse cx="93" cy="108" rx="7" ry="4" fill="#ff7a7a" opacity=".35"/><ellipse cx="147" cy="108" rx="7" ry="4" fill="#ff7a7a" opacity=".35"/>';
+    if(M)o+='<path d="M96 85 H111 M129 85 H144" fill="none" stroke="#2b2540" stroke-width="3.5" stroke-linecap="round"/>';
+    o+=mouth(sel.face[0]);
+    // front hair
+    var fr='<path d="M80 94 Q78 46 120 46 Q162 46 160 94 Q152 70 120 68 Q88 70 80 94Z" fill="'+hc+'"/>';
+    if(hs===0)o+=fr+'<path d="M80 94 Q76 78 82 66 L90 90Z" fill="'+hc+'"/><path d="M160 94 Q164 78 158 66 L150 90Z" fill="'+hc+'"/>';
+    if(hs===1&&!M)o+=fr+'<path d="M80 94 Q76 120 82 140 L90 96Z" fill="'+hc+'"/><path d="M160 94 Q164 120 158 140 L150 96Z" fill="'+hc+'"/>';
+    if(!M&&(hs===2||hs===3))o+=fr;
+    if(M&&hs===1)o+='<path d="M82 88 Q80 52 120 52 Q160 52 158 88 Q150 74 120 72 Q90 74 82 88Z" fill="'+hc+'"/>';
+    if(M&&hs===2)o+='<path d="M80 92 Q78 44 120 44 Q162 44 160 92 Q156 62 120 58 Q84 62 80 92Z" fill="'+hc+'"/>';
+    if(M&&hs===3)o+=fr+'<path d="M78 98 Q70 70 90 56 L94 80Z M162 98 Q170 70 150 56 L146 80Z M100 52 L110 38 L118 52Z M122 52 L134 36 L140 54Z" fill="'+hc+'"/>';
+    if(!M&&hs===4)o+=fr+'<path d="M80 94 Q76 112 80 130 L90 100Z M160 94 Q164 112 160 130 L150 100Z" fill="'+hc+'"/>';
+    if(!M&&hs===5)o+=fr;
+    if(M&&hs===4)o+='<path d="M86 84 Q84 44 120 44 Q156 44 154 84 Q148 62 120 60 Q92 62 86 84Z" fill="'+hc+'"/>';
+    if(M&&hs===5)o+=fr+'<circle cx="96" cy="54" r="13" fill="'+hc+'"/><circle cx="120" cy="46" r="13" fill="'+hc+'"/><circle cx="144" cy="54" r="13" fill="'+hc+'"/><circle cx="84" cy="72" r="11" fill="'+hc+'"/><circle cx="156" cy="72" r="11" fill="'+hc+'"/>';
+    // accessories
+    if(as===1)o+='<g fill="none" stroke="'+ac+'" stroke-width="3"><circle cx="104" cy="96" r="11"/><circle cx="136" cy="96" r="11"/><path d="M115 96 H125"/></g>';
+    if(as===2)o+='<g fill="'+ac+'"><rect x="91" y="87" width="26" height="18" rx="7"/><rect x="123" y="87" width="26" height="18" rx="7"/><rect x="115" y="92" width="10" height="4"/></g>';
+    if(as===3)o+='<ellipse cx="120" cy="64" rx="56" ry="9" fill="'+ac+'"/><path d="M84 64 Q84 26 120 26 Q156 26 156 64Z" fill="'+ac+'"/><rect x="84" y="54" width="72" height="8" fill="'+shade(ac,-50)+'"/>';
+    if(as===4)o+='<g fill="'+ac+'"><path d="M150 58 L176 44 V74Z"/><path d="M150 58 L124 44 V74Z"/><circle cx="150" cy="58" r="7" stroke="'+shade(ac,-50)+'" stroke-width="2"/></g>';
+    if(as===5)o+='<path d="M92 56 L96 32 L108 46 L120 28 L132 46 L144 32 L148 56Z" fill="'+ac+'" stroke="#2b2540" stroke-width="2" stroke-linejoin="round"/>';
+    var d=document.getElementById('doll');if(as===6)o+='<path d="M82 66 Q82 24 120 24 Q158 24 158 66Z" fill="'+ac+'"/><rect x="80" y="58" width="80" height="14" rx="7" fill="'+shade(ac,-40)+'"/><circle cx="120" cy="22" r="7" fill="'+shade(ac,40)+'"/>';
+    if(as===7)o+='<path d="M82 78 Q120 40 158 78" fill="none" stroke="'+ac+'" stroke-width="8" stroke-linecap="round"/>';
+    d.innerHTML=o;
+  }
+
+  function renderTabs(){
+    var t=document.getElementById('tabs');t.innerHTML='';
+    CATS.forEach(function(c){if(mode==='shop'&&HIDE[c.id])return;var b=document.createElement('button');b.className='tab';b.textContent=c.label;
+      b.setAttribute('role','tab');b.setAttribute('aria-selected',c.id===tab);
+      b.onclick=function(){tab=c.id;renderTabs();renderOpts()};t.appendChild(b)});
+  }
+  function renderOpts(){
+    var c=CATS.filter(function(x){return x.id===tab})[0],box=document.getElementById('opts');box.innerHTML='';
+    var sty=c.styles&&(g==='m'&&c.m?c.m:c.styles);
+    if(sty){
+      var h=document.createElement('h2');h.textContent='모양';box.appendChild(h);
+      var w=document.createElement('div');w.className='chips';
+      sty.forEach(function(s,i){var b=document.createElement('button');b.className='chip'+(mode==='shop'&&PRICE[c.id]?' tag':'');b.textContent=s;if(mode==='shop'&&PRICE[c.id]){var pr=document.createElement('small');pr.textContent=won(PRICE[c.id][i]);b.appendChild(pr)}
+        b.setAttribute('aria-pressed',sel[c.id][0]===i);
+        b.onclick=function(){sel[c.id][0]=i;update()};w.appendChild(b)});
+      box.appendChild(w);
+    }
+    if(!c.colors.length)return;
+    var h2=document.createElement('h2');h2.textContent='색깔';box.appendChild(h2);
+    var s=document.createElement('div');s.className='sw';
+    c.colors.forEach(function(k,i){var b=document.createElement('button');b.className='dot';b.style.background=k;
+      b.setAttribute('aria-label',c.label+' 색 '+(i+1));b.setAttribute('aria-pressed',sel[c.id][1]===i&&!sel[c.id][2]);
+      b.onclick=function(){sel[c.id][1]=i;sel[c.id].length=2;update()};s.appendChild(b)});
+    box.appendChild(s);
+    var lb=document.createElement('label');lb.className='pick';lb.textContent='원하는 색 직접 고르기';
+    var ip=document.createElement('input');ip.type='color';ip.value=col(c.id);
+    ip.oninput=function(){sel[c.id][2]=ip.value;draw();refreshTotal()};
+    ip.onchange=function(){renderOpts()};
+    lb.appendChild(ip);box.appendChild(lb);
+  }
+  function update(){draw();renderOpts();refreshTotal();
+    var d=document.getElementById('doll');d.classList.remove('bounce');void d.getBoundingClientRect();d.classList.add('bounce')}
+  document.getElementById('rnd').onclick=function(){
+    CATS.forEach(function(c){sel[c.id]=[c.styles?Math.floor(Math.random()*c.styles.length):0,Math.floor(Math.random()*c.colors.length)]});update()};
+  document.getElementById('rst').onclick=function(){g='f';reset();renderGender();update()};
+  function renderGender(){
+    var w=document.getElementById('gender');w.innerHTML='';
+    [['f','여자'],['m','남자']].forEach(function(p){var b=document.createElement('button');b.className='chip';b.textContent=p[1];
+      b.setAttribute('aria-pressed',g===p[0]);
+      b.onclick=function(){if(g===p[0])return;g=p[0];sel.hair[0]=0;sel.top[0]=0;sel.bottom[0]=0;renderGender();update()};w.appendChild(b)});
+  }
+  var PRICE={top:[15000,25000,38000,12000,30000],bottom:[20000,18000,22000,26000,18000],shoes:[30000,45000,15000,40000,38000],outer:[0,35000,60000,90000,28000,120000],socks:[0,3000,5000,6000,7000,5000],bag:[0,25000,30000,22000,35000,18000],acc:[0,8000,10000,12000,5000,15000,9000,5000]};
+  var HIDE={hair:1,skin:1,bg:1,face:1,pose:1};
+  var cur,cname='',res=null,served=0,sales=0,last=-1,day=1,dayN=0,daySales=0,perDay=5,regs=[],isReg=null,summary=null,lastName='',disc=0,D=null,lives=0,rating=3,isVip=false;
+  function won(n){return n.toLocaleString('ko-KR')+'원'}
+  function priceTxt(id,i){return mode==='shop'&&PRICE[id]?' '+won(PRICE[id][i]):''}
+  function total(){var t=0;['top','bottom','shoes','outer','socks','bag','acc'].forEach(function(k){if(k==='bottom'&&g==='f'&&sel.top[0]===2)return;t+=PRICE[k][sel[k][0]]});return t}
+  function bright(h){var n=parseInt(h.slice(1),16);return((n>>16)*299+(n>>8&255)*587+(n&255)*114)/1000}
+  var REQ=[
+    {t:'내일 소풍 가요! 편하게 입을 수 있고 밝은 색이면 좋겠어요.',b:100000,c:[['밝은 색 상의',function(){return bright(col('top'))>150}],['운동화',function(){return sel.shoes[0]===0}],['바지나 반바지',function(){return(g==='m'||sel.top[0]!==2)&&!(g==='f'&&sel.bottom[0]===1)}],['가방',function(){return sel.bag[0]!==0}]]},
+    {t:'오늘 너무 추워요. 따뜻하게 입고 싶어요!',b:200000,c:[['후드티',function(){return sel.top[0]===1}],['긴 바지',function(){return sel.bottom[0]===0}],['부츠',function(){return sel.shoes[0]===1}],['외투',function(){return sel.outer[0]!==0}]]},
+    {t:'주말에 바다 가요! 시원하고 신나게 입을래요.',b:60000,c:[['반바지',function(){return g==='m'?sel.bottom[0]===1:sel.bottom[0]===2}],['샌들',function(){return sel.shoes[0]===2}],['모자나 선글라스',function(){return sel.acc[0]===2||sel.acc[0]===3}]]},
+    {t:'친구 생일 파티에 가요. 반짝반짝 눈에 띄고 싶어요!',b:120000,c:[['원피스나 셔츠',function(){return sel.top[0]===2}],['왕관이나 리본',function(){return sel.acc[0]===4||sel.acc[0]===5}],['눈에 띄는 색 상의',function(){return bright(col('top'))>140}]]},
+    {t:'면접 보러 가요. 단정하고 믿음직하게 보이고 싶어요.',b:120000,c:[['원피스나 셔츠',function(){return sel.top[0]===2}],['샌들이 아닌 신발',function(){return sel.shoes[0]!==2}],['소품 없음 또는 안경',function(){return sel.acc[0]===0||sel.acc[0]===1}],['흰색이나 어두운 상의',function(){return col('top')==='#ffffff'||bright(col('top'))<60}]]},
+    {t:'가을 산책 가요! 가볍게 걸칠 외투랑 편한 양말이 필요해요.',b:130000,c:[['외투',function(){return sel.outer[0]!==0}],['양말',function(){return sel.socks[0]!==0}],['운동화',function(){return sel.shoes[0]===0}]]}
+  ];
+  function rnd(n){return Math.floor(Math.random()*n)}
+  function newCustomer(){
+    if(!D){res=null;summary=null;tab='top';renderTabs();update();renderShop();return}
+    if(checkEnd())return;
+    var k;do{k=rnd(REQ.length)}while(k===last);last=k;cur=REQ[k];
+    g=Math.random()<.5?'f':'m';
+    var nm=g==='f'?['민지','서연','하은']:['준호','도윤','지후'];cname=nm[rnd(3)];
+    reset();sel.skin=[0,rnd(5)];sel.hair=[rnd(6),rnd(6)];sel.bg=[0,0];res=null;summary=null;tab='top';isReg=null;disc=0;
+    var cand=regs.filter(function(r){return r.name!==lastName});
+    if(cand.length&&Math.random()<.35){isReg=cand[rnd(cand.length)];g=isReg.g;cname=isReg.name;sel.skin=[0,isReg.skin];sel.hair=isReg.hair.slice()}
+    isVip=!isReg&&Math.random()<vipP();
+    renderTabs();update();renderShop();
+  }
+  function refreshTotal(){var e=document.getElementById('tot');if(e&&D){e.textContent=disc?won(total())+' → '+won(pay()):won(total());e.style.color=pay()>bud()?'var(--pop)':'inherit'}}
+  function renderShop(){
+    var s=document.getElementById('shop');
+    if(!D){s.innerHTML=selectHtml();Array.prototype.forEach.call(s.querySelectorAll('[data-lv]'),function(b){b.onclick=function(){startGame(+b.getAttribute('data-lv'))}});return}
+    var h='<div class="sign"><b>우리 옷 가게</b><small>영업 중</small></div><div class="stats"><span>'+D.n+' · '+day+'일차 · 손님 '+dayN+'/'+perDay+(D.lives?' · 기회 '+'♥'.repeat(lives):'')+'</span><span>오늘 '+won(daySales)+' / 목표 '+won(goal())+'</span></div><div class="stats"><span>총 매출 '+won(sales)+' / 클리어 '+won(D.target)+'</span><span>단골 '+regs.length+'명'+(regs.length?' ('+regs.map(function(r){return r.name}).join(', ')+')':'')+'</span></div><div class="stats"><span>가게 평점 <b>★ '+rating.toFixed(1)+'</b></span><span>VIP 손님 확률 '+Math.round(vipP()*100)+'%</span></div><div class="bar"><i style="width:'+Math.min(100,sales/D.target*100)+'%"></i></div>';
+    if(summary){s.innerHTML=h+summary;var sb=document.getElementById('nxt2');if(sb)sb.onclick=nextDay;var ag=document.getElementById('again');if(ag)ag.onclick=function(){D=null;summary=null;newCustomer()};return}
+    h+='<div class="bubble"><b>'+(isVip?'<span class="vip">VIP</span>':'')+cname+' 손님'+(isReg?' (단골)':'')+'</b><p>“'+cur.t+'”</p><p>예산 '+won(bud())+' · 고른 옷 <b id="tot"></b></p></div>';
+    h+=res?res:'<div class="chips" style="margin-bottom:10px">'+[0,10,20,30].map(function(d){return'<button class="chip" data-d="'+d+'" aria-pressed="'+(disc===d)+'">'+(d?d+'% 할인':'정가')+'</button>'}).join('')+'</div><button class="act pop" id="rec">이 옷 추천하기</button>';
+    h+='<button class="chip" id="chg">난이도 다시 고르기</button>';s.innerHTML=h;refreshTotal();
+    Array.prototype.forEach.call(s.querySelectorAll('[data-d]'),function(b){b.onclick=function(){disc=+b.getAttribute('data-d');renderShop()}});
+    var r=document.getElementById('rec');if(r)r.onclick=recommend;var cg=document.getElementById('chg');if(cg)cg.onclick=function(){D=null;summary=null;res=null;newCustomer()};
+    var n=document.getElementById('nxt');if(n)n.onclick=dayN>=perDay?endDay:newCustomer;
+  }
+  function recommend(){
+    var tot=pay(),ok=cur.c.map(function(x){return x[1]()}),n=ok.filter(Boolean).length,len=cur.c.length,msg,gain=0,st;
+    if(tot>bud()){st=0;msg='너무 비싸요… 예산을 넘었어요. 다음에 올게요.'}
+    else if(n===len){st=3;gain=Math.round(tot*1.1);msg='완벽해요! 이걸로 할게요. 팁도 드릴게요!'}
+    else if(n>=Math.ceil(len*Math.max(D.need,isVip?.66:0))){st=2;gain=tot;msg='음, 괜찮네요. 이걸로 살게요.'}
+    else{st=1;msg='제가 원하던 느낌이 아니에요…'}
+    var note='';
+    if(isVip&&gain){gain=Math.round(gain*1.5);note='VIP 프리미엄! '}
+    if(isReg&&gain){gain=Math.round(gain*1.2);note='단골 팁 포함! '}
+    if(isReg&&st<=1){regs=regs.filter(function(r){return r!==isReg});note+='단골이 발길을 끊었어요… '}
+    if(!isReg&&st===3){regs.push({name:cname,g:g,skin:sel.skin[1],hair:sel.hair.slice()});note+='단골이 되었어요! '}
+    sales+=gain;daySales+=gain;dayN++;served++;lastName=cname;
+    var w=isVip?.3:.2,sc=[1,2.5,4,5][st];rating=Math.max(1,Math.min(5,Math.round((rating*(1-w)+sc*w)*10)/10));
+    var rows=cur.c.map(function(x,i){return'<li>'+(ok[i]?'✓ ':'✗ ')+x[0]+'</li>'}).join('');
+    res='<div class="res"><div class="stars" aria-label="별 '+st+'개">'+'★'.repeat(st)+'☆'.repeat(3-st)+'</div><p>“'+msg+'”</p><ul>'+rows+'</ul>'+(gain?receipt():'')+'<p>'+note+(gain?'판매 +'+won(gain):'판매 실패')+'</p></div><button class="act" id="nxt">'+(dayN>=perDay?'오늘 정산하기':'다음 손님')+'</button>';
+    renderShop();
+  }
+  function pay(){return Math.round(total()*(100-disc)/10000)*100}
+  function receipt(){
+    var L='';
+    ['top','bottom','shoes','outer','socks','bag','acc'].forEach(function(k){
+      if(k==='bottom'&&g==='f'&&sel.top[0]===2)return;
+      var i=sel[k][0];if(i===0&&k!=='top'&&k!=='bottom'&&k!=='shoes')return;
+      var c=CATS.filter(function(x){return x.id===k})[0],nm=(g==='m'&&c.m?c.m:c.styles)[i];
+      L+='<div><span>'+nm+'</span><span>'+won(PRICE[k][i])+'</span></div>'});
+    if(disc)L+='<div><span>'+disc+'% 할인</span><span>-'+won(total()-pay())+'</span></div>';
+    return '<div class="rcpt">'+L+'<div class="sum"><span>합계</span><span>'+won(pay())+'</span></div></div>';
+  }
+  var DIFF=[
+    {n:'쉬움',target:800000,g0:100000,gs:10000,need:.3,bm:1.2,lives:0},
+    {n:'보통',target:2000000,g0:200000,gs:20000,need:.5,bm:1,lives:5},
+    {n:'어려움',target:3000000,g0:300000,gs:25000,need:.66,bm:1,lives:3},
+    {n:'지옥',target:4000000,g0:400000,gs:20000,need:.66,bm:.9,lives:2},
+    {n:'신',target:6000000,g0:450000,gs:20000,need:1,bm:.85,lives:1},
+    {n:'불가능',target:100000000,g0:1000000,gs:0,need:1,bm:.7,lives:1}
+  ];
+  function custCount(){return Math.max(3,Math.min(8,Math.round(5+(rating-3)*1.5)))}
+  function vipP(){return Math.max(0,(rating-3)*.15)}
+  function goal(){return D.g0+(day-1)*D.gs}
+  function bud(){return Math.round(cur.b*D.bm*(isVip?2:1)/1000)*1000}
+  function selectHtml(){
+    return '<div class="sign"><b>우리 옷 가게</b><small>오픈 준비</small></div><div class="bubble"><p>난이도를 골라 주세요. 목표 매출을 모으면 클리어예요!</p></div>'+DIFF.map(function(d,i){return'<button class="act" data-lv="'+i+'">'+d.n+' · 목표 '+won(d.target)+'<br><small>하루 목표 '+won(d.g0)+'부터 · '+(d.lives?'기회 '+d.lives+'번':'기회 무제한')+'</small></button>'}).join('');
+  }
+  function startGame(i){D=DIFF[i];day=1;dayN=0;daySales=0;sales=0;served=0;regs=[];lives=D.lives;last=-1;lastName='';rating=3;isVip=false;perDay=custCount();newCustomer()}
+  function checkEnd(){
+    if(!D||sales<D.target)return false;
+    summary='<div class="res"><div class="stars">클리어!</div><p>'+D.n+' 난이도 목표 '+won(D.target)+'을 모았어요!</p><p>'+day+'일차 · 총 매출 '+won(sales)+' · 단골 '+regs.length+'명</p></div><button class="act pop" id="again">난이도 다시 고르기</button>';
+    renderShop();return true;
+  }
+  function gameOver(){
+    summary='<div class="res"><div class="stars">게임 오버</div><p>기회를 모두 잃었어요… '+D.n+' · '+day+'일차 · 총 매출 '+won(sales)+'</p></div><button class="act pop" id="again">난이도 다시 고르기</button>';
+    renderShop();
+  }
+  function endDay(){
+    var ok=daySales>=goal(),bonus=ok?Math.round(goal()*0.1):0;
+    sales+=bonus;res=null;if(checkEnd())return;if(!ok&&D.lives){lives--;if(lives<=0){gameOver();return}}
+    summary='<div class="res"><div class="stars">'+(ok?'영업 성공!':'아쉬워요')+'</div><p>'+day+'일차 매출 '+won(daySales)+' / 목표 '+won(goal())+'</p><p>'+(ok?'목표 달성 보너스 +'+won(bonus):'목표까지 '+won(goal()-daySales)+' 모자랐어요.'+(D.lives?' 남은 기회 '+lives+'번':''))+'</p></div><button class="act pop" id="nxt2">'+(ok?(day+1)+'일차 시작하기':'같은 날 다시 도전')+'</button>';
+    renderShop();
+  }
+  function nextDay(){if(daySales>=goal())day++;dayN=0;daySales=0;summary=null;perDay=custCount();newCustomer()}
+  function setMode(m){
+    mode=m;res=null;
+    document.getElementById('shop').hidden=m!=='shop';
+    document.getElementById('gender').style.display=m==='shop'?'none':'flex';
+    document.getElementById('acts').style.display=m==='shop'?'none':'flex';
+    renderModes();
+    if(m==='shop'){newCustomer()}else{tab='hair';reset();renderGender();renderTabs();update()}
+  }
+  function renderModes(){
+    var w=document.getElementById('modes');w.innerHTML='';
+    [['play','꾸미기'],['shop','옷 가게']].forEach(function(p){var b=document.createElement('button');b.className='chip';b.textContent=p[1];
+      b.setAttribute('aria-pressed',mode===p[0]);b.onclick=function(){if(mode!==p[0])setMode(p[0])};w.appendChild(b)});
+  }
+  renderModes();renderGender();renderTabs();draw();renderOpts();
+</script>
+</body>
+</html>
